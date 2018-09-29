@@ -103,6 +103,7 @@ h3Isen=enthalpy_mass(Air3);
 h3=h2p + (h3Isen-h2p)/eta;
 set(Air3, 'P', P3, 'Enthalpy', h3);
 w2=h3-h2p;
+w=w1+w2;
 
 % Compressor 1 Process
     ProcessP1a=linspace(P1,pi21*P1,N)';
@@ -126,16 +127,24 @@ for i=2:N
     ProcessT1a(i)=temperature(Air2);
 end
 
+% Intercooler Process
+    ProcessP3a=ProcessP1a(end)*ones(N,1);
+    ProcessT3a=linspace(ProcessT1a(end), ProcessT1a(end) - epsilon*(ProcessT1a(end)-T1));
+    ProcessH3a=zeros(N,1); ProcessH3a(1)=ProcessH1a(end);
+    ProcessS3a=zeros(N,1); ProcessS3a(1)=ProcessS1a(end);
+for i=2:N
+    Air2p=Air;
+    set(Air2p, 'P', ProcessP3a(i), 'T', ProcessT3a(i));
+    ProcessH3a(i)=enthalpy_mass(Air2p);
+    ProcessS3a(i)=entropy_mass(Air2p);
+end
+
 % Compressor 2 Process
-    ProcessP2a=linspace(P2p,P3,N)';
-    ProcessT2a=zeros(N,1); ProcessT2a(1)=T2p;
-    ProcessH2a=zeros(N,1);
-    ProcessS2a=zeros(N,1);
-% Initialize
-    Air1=Air;
-    set(Air1, 'P', ProcessP2a(1), 'T', ProcessT2a(1));
-    ProcessS2a(1)=entropy_mass(Air1);
-    ProcessH2a(1)=enthalpy_mass(Air1);
+    ProcessP2a=linspace(ProcessP3a(end),P3,N)';
+    ProcessT2a=zeros(N,1); ProcessT2a(1)=ProcessT3a(end);
+    ProcessH2a=zeros(N,1); ProcessH2a(1)=ProcessH3a(end);
+    ProcessS2a=zeros(N,1); ProcessS2a(1)=ProcessS3a(end);
+
 % For each cross-section
 for i=2:N
     Air2=Air;
@@ -175,5 +184,5 @@ end
 
 figure;
 hold on;
-plot([ProcessS1a; ProcessS2a], [ProcessH1a; ProcessH2a]);
+plot([ProcessS1a; ProcessS3a; ProcessS2a], [ProcessH1a; ProcessH3a; ProcessH2a]);
 plot(ProcessS, ProcessH);
