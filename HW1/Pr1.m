@@ -9,7 +9,7 @@ Rho1=density(w1);
 V1=m/Rho1;
 
 % Process
-N=500;
+N=250;
 P2=2e6;
 ProcessP=linspace(P1, P2, N).';
 ProcessT=zeros(N,1); ProcessT(1)=T1;
@@ -25,7 +25,7 @@ for i=2:N
     ProcessX(i)=vaporFraction(wi);
     disp(i);
 end
-Q=trapz(ProcessT, ProcessCv)*m;
+Q=(intEnergy_mass(wi)-intEnergy_mass(w1))*m;
 plot(ProcessS, ProcessT, 'k');
 xlabel('s(J/kgK)'); ylabel('T(K)');
 save('Pr1.mat');
