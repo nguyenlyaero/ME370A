@@ -25,7 +25,7 @@ for i=2:n
 end
 
 % Answers
-Work=trapz(ProcessV, ProcessP);
+Work=enthalpy_mass(w1)-enthalpy_mass(w2);
 OutQuality=vaporFraction(w2);
 OutT=temperature(w2);
 plot(ProcessH, ProcessP);

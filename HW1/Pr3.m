@@ -54,7 +54,6 @@ wmin=M;
 pi21min=pi21s(I);
 
 %% Processes
-pi21min=3.1818;
 N=100;
 eta=0.7;
 epsilon=0.85;
