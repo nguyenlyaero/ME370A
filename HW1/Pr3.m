@@ -28,11 +28,14 @@ w1=h2-h1;
 
 % State 2p (after intercooler)
 Air2p=Air;
-T2p=T2 - epsilon*(T2-T1);
+Airtemp=Air;
 P2p=P2;
-set(Air2p, 'P', P2p, 'T', T2p);
+set(Airtemp, 'P', P2p, 'T', T1);
+htemp=enthalpy_mass(Airtemp);
+h2p=h2-epsilon*(h2-htemp);
+set(Air2p, 'P', P2p, 'Enthalpy', h2p);
 s2p=entropy_mass(Air2p);
-h2p=enthalpy_mass(Air2p);
+T2p=temperature(Air2p);
 
 % State 3
 Air3=Air;

@@ -26,8 +26,31 @@ for i=2:N
     disp(i);
 end
 Q=(intEnergy_mass(wi)-intEnergy_mass(w1))*m;
+
+% Vapor dome
+Tc=critTemperature(w1);
+Pc=critPressure(w1);
+wi=Water;
+set(wi, 'P', Pc, 'T', Tc);
+Sc=entropy_mass(wi);
+Ts=linspace(400, Tc, 100);
+Ss=zeros(100,2); Ss(100,:)=[Sc Sc];
+for i=1:99
+    wi=Water;
+    set(wi, 'Vapor', 0, 'T', Ts(i));
+    Ss(i,1)=entropy_mass(wi);
+    set(wi, 'Vapor', 1, 'T', Ts(i));
+    Ss(i,2)=entropy_mass(wi);
+end
+
+
+figure;
+hold on;
 plot(ProcessS, ProcessT, 'k');
+plot(Ss(:,1), Ts, 'k--');
+plot(Ss(:,2), Ts, 'k--');
 xlabel('s(J/kgK)'); ylabel('T(K)');
+hold off;
 save('Pr1.mat');
 
 
