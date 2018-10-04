@@ -21,7 +21,7 @@ s2Isen=s1;
 set(Air2, 'P', P2, 'S', s2Isen);
 h2Isen=enthalpy_mass(Air2);
 % real
-h2=h1 + (h2Isen-h1)/eta;
+h2=h1 + eta*(h2Isen-h1);
 set(Air2, 'P', P2, 'Enthalpy', h2);
 T2=temperature(Air2);
 w1=h2-h1;
@@ -45,7 +45,7 @@ s3Isen=s2p;
 set(Air3, 'P', P3, 'S', s3Isen);
 h3Isen=enthalpy_mass(Air3);
 % real
-h3=h2p + (h3Isen-h2p)/eta;
+h3=h2p + eta*(h3Isen-h2p);
 set(Air3, 'P', P3, 'Enthalpy', h3);
 w2=h3-h2p;
 
@@ -81,18 +81,21 @@ s2Isen=s1;
 set(Air2, 'P', P2, 'S', s2Isen);
 h2Isen=enthalpy_mass(Air2);
 % real
-h2=h1 + (h2Isen-h1)/eta;
+h2=h1 + eta*(h2Isen-h1);
 set(Air2, 'P', P2, 'Enthalpy', h2);
 T2=temperature(Air2);
 w1=h2-h1;
 
 % State 2p (after intercooler)
 Air2p=Air;
-T2p=T2 - epsilon*(T2-T1);
+Airtemp=Air;
 P2p=P2;
-set(Air2p, 'P', P2p, 'T', T2p);
+set(Airtemp, 'P', P2p, 'T', T1);
+htemp=enthalpy_mass(Airtemp);
+h2p=h2-epsilon*(h2-htemp);
+set(Air2p, 'P', P2p, 'Enthalpy', h2p);
 s2p=entropy_mass(Air2p);
-h2p=enthalpy_mass(Air2p);
+T2p=temperature(Air2p);
 
 % State 3
 Air3=Air;
@@ -102,7 +105,7 @@ s3Isen=s2p;
 set(Air3, 'P', P3, 'S', s3Isen);
 h3Isen=enthalpy_mass(Air3);
 % real
-h3=h2p + (h3Isen-h2p)/eta;
+h3=h2p + eta*(h3Isen-h2p);
 set(Air3, 'P', P3, 'Enthalpy', h3);
 w2=h3-h2p;
 w=w1+w2;
@@ -123,21 +126,35 @@ for i=2:N
     % if isentropic
     set(Air2, 'P', ProcessP1a(i), 'S', ProcessS1a(1));
     % real
-    ProcessH1a(i)=ProcessH1a(1) + (enthalpy_mass(Air2)-ProcessH1a(1))/eta;
+    ProcessH1a(i)=ProcessH1a(1) + eta*(enthalpy_mass(Air2)-ProcessH1a(1));
     set(Air2, 'P', ProcessP1a(i), 'Enthalpy', ProcessH1a(i));
     ProcessS1a(i)=entropy_mass(Air2);
     ProcessT1a(i)=temperature(Air2);
 end
 
 % Intercooler Process
+%     ProcessP3a=ProcessP1a(end)*ones(N,1);
+%     ProcessT3a=linspace(ProcessT1a(end), ProcessT1a(end) - epsilon*(ProcessT1a(end)-T1));
+%     ProcessH3a=zeros(N,1); ProcessH3a(1)=ProcessH1a(end);
+%     ProcessS3a=zeros(N,1); ProcessS3a(1)=ProcessS1a(end);
+% for i=2:N
+%     Air2p=Air;
+%     set(Air2p, 'P', ProcessP3a(i), 'T', ProcessT3a(i));
+%     ProcessH3a(i)=enthalpy_mass(Air2p);
+%     ProcessS3a(i)=entropy_mass(Air2p);
+% end
+
     ProcessP3a=ProcessP1a(end)*ones(N,1);
-    ProcessT3a=linspace(ProcessT1a(end), ProcessT1a(end) - epsilon*(ProcessT1a(end)-T1));
-    ProcessH3a=zeros(N,1); ProcessH3a(1)=ProcessH1a(end);
+    ProcessT3a=zeros(N,1); ProcessT3a(1)=ProcessT1a(end);
+    Air2p=Air;
+    set(Air2p, 'T', T1, 'P', ProcessP1a(end));
+    htemp=enthalpy_mass(Air2p);
+    ProcessH3a=linspace(ProcessH1a(end), ProcessH1a(end) - epsilon*(ProcessH1a(end)-htemp))';
     ProcessS3a=zeros(N,1); ProcessS3a(1)=ProcessS1a(end);
 for i=2:N
     Air2p=Air;
-    set(Air2p, 'P', ProcessP3a(i), 'T', ProcessT3a(i));
-    ProcessH3a(i)=enthalpy_mass(Air2p);
+    set(Air2p, 'P', ProcessP3a(i), 'Enthalpy', ProcessH3a(i));
+    ProcessT3a(i)=temperature(Air2p);
     ProcessS3a(i)=entropy_mass(Air2p);
 end
 
@@ -153,7 +170,7 @@ for i=2:N
     % if isentropic
     set(Air2, 'P', ProcessP2a(i), 'S', ProcessS2a(1));
     % real
-    ProcessH2a(i)=ProcessH2a(1) + (enthalpy_mass(Air2)-ProcessH2a(1))/eta;
+    ProcessH2a(i)=ProcessH2a(1) + eta*(enthalpy_mass(Air2)-ProcessH2a(1));
     set(Air2, 'P', ProcessP2a(i), 'Enthalpy', ProcessH2a(i));
     ProcessS2a(i)=entropy_mass(Air2);
     ProcessT2a(i)=temperature(Air2);
@@ -176,7 +193,7 @@ for i=2:N
     % if isentropic
     set(Air2, 'P', ProcessP(i), 'S', ProcessS(1));
     % real
-    ProcessH(i)=ProcessH(1) + (enthalpy_mass(Air2)-ProcessH(1))/eta;
+    ProcessH(i)=ProcessH(1) + eta*(enthalpy_mass(Air2)-ProcessH(1));
     set(Air2, 'P', ProcessP(i), 'Enthalpy', ProcessH(i));
     ProcessS(i)=entropy_mass(Air2);
     ProcessT(i)=temperature(Air2);
