@@ -49,9 +49,9 @@ hold on;
 plot(ProcessS, ProcessT, 'k');
 plot(Ss(:,1), Ts, 'k--');
 plot(Ss(:,2), Ts, 'k--');
+legend('Process', 'Vapor Dome')
 xlabel('s(J/kgK)'); ylabel('T(K)');
 hold off;
-save('Pr1.mat');
 
 
 

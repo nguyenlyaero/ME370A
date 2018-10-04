@@ -203,5 +203,8 @@ end
 
 figure;
 hold on;
-plot([ProcessS1a; ProcessS3a; ProcessS2a], [ProcessH1a; ProcessH3a; ProcessH2a]);
-plot(ProcessS, ProcessH);
+plot([ProcessS1a; ProcessS3a; ProcessS2a], [ProcessH1a; ProcessH3a; ProcessH2a],'k');
+plot(ProcessS, ProcessH, 'k--');
+xlabel('s(J/kgK)'); ylabel('h(J/kg)');
+legend('2-Stage Compressor', 'Single-Stage Compressor');
+hold off;
